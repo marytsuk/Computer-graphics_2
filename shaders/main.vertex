@@ -1,0 +1,33 @@
+#version 330 core
+
+layout(location = 0) in vec3 vertex;
+layout(location = 1) in vec2 uvs;
+layout(location = 2) in vec3 normals;
+
+out vec2 UV;
+out vec3 pos_in_world;
+out vec3 normal_cam;
+out vec3 eye_cam;
+out vec3 light_cam;
+
+uniform mat4 MVP;
+uniform mat4 V;
+uniform mat4 M;
+uniform vec3 light_pos;
+
+void main()
+{
+	gl_Position =  MVP * vec4(vertex, 1);
+	
+	pos_in_world = (M * vec4(vertex, 1)).xyz;
+	
+	vec3 vertex_cam = (V * M * vec4(vertex, 1)).xyz;
+	eye_cam = vec3(0 ,0, 0) - vertex_cam;
+
+	vec3 light_pos_cam = (V * vec4(light_pos, 1)).xyz;
+	light_cam = light_pos_cam + eye_cam;
+	
+	normal_cam = (V * M * vec4(normals, 0)).xyz;  
+	UV = uvs;
+}
+
