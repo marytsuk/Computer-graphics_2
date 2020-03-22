@@ -1,0 +1,36 @@
+#version 330 core
+
+in vec2 UV;
+in vec3 pos_in_world;
+in vec3 normal_cam;
+in vec3 eye_cam;
+in vec3 light_cam;
+
+out vec4 color;
+
+uniform sampler2D my_texture;
+uniform mat4 MV;
+uniform vec3 light_pos;
+
+void main()
+{
+	vec3 LightColor = vec3(1, 1, 1);
+	float LightPower = 1.0f;
+	
+	vec3 DiffuseColor = texture(my_texture, UV).rgb;
+	vec3 AmbientColor = vec3(0.1, 0.1, 0.1) * DiffuseColor;
+	vec3 SpecularColor = vec3(1, 1, 1);
+
+	vec3 n = normalize(normal_cam);
+	vec3 l = normalize(light_cam);
+	float cos_alpha = max(dot(n, l), 0);
+	
+	vec3 e = normalize(eye_cam);
+	vec3 r = reflect(-l, n);
+	float cos_betta = max(dot(e, r), 0);
+	
+	color.rgb = AmbientColor +
+		DiffuseColor * LightColor * LightPower * cos_alpha +
+		SpecularColor * LightColor * LightPower * pow(cos_betta, 5);
+	color.a = 0.4;
+}
